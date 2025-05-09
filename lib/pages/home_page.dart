@@ -136,6 +136,8 @@ class HomePage extends StatelessWidget {
                                     (context) => AddEditTransactionPage(
                                       navBarTitle: 'Edit Transaction',
                                       isEdit: true,
+                                      data: transactionList,
+                                      index: index,
                                     ),
                               ),
                             );

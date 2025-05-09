@@ -1,4 +1,5 @@
 import 'package:finote/model/category_model.dart';
+import 'package:finote/model/transaction_model.dart';
 import 'package:finote/shared/shared.dart';
 import 'package:finote/widgets/widget.dart';
 import 'package:flutter/material.dart';
@@ -6,10 +7,15 @@ import 'package:flutter/material.dart';
 class AddEditTransactionPage extends StatefulWidget {
   final String navBarTitle;
   final bool isEdit;
+  final List<TransactionModel>? data;
+  final int? index;
+
   const AddEditTransactionPage({
     super.key,
     required this.navBarTitle,
     this.isEdit = false,
+    this.data,
+    this.index,
   });
 
   @override
@@ -28,11 +34,22 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   @override
   void initState() {
     super.initState();
+    if (widget.isEdit) {
+      final finalData = widget.data![widget.index!];
+
+      isIncome = finalData.isIncome;
+      amountController = TextEditingController(
+        text: finalData.amount.toString(),
+      );
+      categoryController = finalData.category;
+    }
     updateCategories();
   }
 
   void updateCategories() {
-    categoryController = '- select category -';
+    if (!widget.isEdit) {
+      categoryController = '- select category -';
+    }
     categories = ['- select category -'];
     categories.addAll(
       categoryList
@@ -48,7 +65,14 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
       backgroundColor: primaryColor,
       appBar: AppBar(
         toolbarHeight: 75,
-        title: Text(widget.navBarTitle, style: navTextStyle),
+        title: Text(
+          widget.isEdit
+              ? isIncome
+                  ? 'Edit Income'
+                  : 'Edit Expanse'
+              : widget.navBarTitle,
+          style: navTextStyle,
+        ),
         backgroundColor: secondaryColor,
         leading: null,
       ),
@@ -59,22 +83,26 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
             children: [
               Row(
                 children: [
-                  Switch(
-                    value: isIncome,
-                    onChanged: (value) async {
-                      categoryController = null;
-                      setState(() {
-                        isIncome = value;
-                        updateCategories();
-                      });
-                    },
-                    activeColor: whiteColor,
-                    activeTrackColor: greenColor,
-                    inactiveThumbColor: whiteColor,
-                    inactiveTrackColor: redColor,
-                  ),
+                  widget.isEdit
+                      ? SizedBox()
+                      : Switch(
+                        value: isIncome,
+                        onChanged: (value) async {
+                          categoryController = null;
+                          setState(() {
+                            isIncome = value;
+                            updateCategories();
+                          });
+                        },
+                        activeColor: whiteColor,
+                        activeTrackColor: greenColor,
+                        inactiveThumbColor: whiteColor,
+                        inactiveTrackColor: redColor,
+                      ),
                   SpaceWidth(10),
-                  isIncome
+                  widget.isEdit
+                      ? SizedBox()
+                      : isIncome
                       ? Text('Income', style: lableListTextStyle)
                       : Text('Expanse', style: lableListTextStyle),
                 ],
@@ -137,7 +165,12 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               ),
               SpaceHeight(30),
               CustomButtonWidget(
-                title: isIncome ? 'Add Income' : 'Add Expanse',
+                title:
+                    widget.isEdit
+                        ? 'Save Change'
+                        : isIncome
+                        ? 'Add Income'
+                        : 'Add Expanse',
                 width: double.infinity,
                 onPressed: () {},
               ),
