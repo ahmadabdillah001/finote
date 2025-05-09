@@ -2,19 +2,21 @@ import 'package:finote/shared/shared.dart';
 import 'package:flutter/material.dart';
 
 class InputFormWidget extends StatefulWidget {
-  TextEditingController controller;
-  String label;
-  String hint;
-  double width;
-  bool isPassword;
+  final TextEditingController controller;
+  final String label;
+  final String hint;
+  final double width;
+  final bool isPassword;
+  final Color? color;
 
-  InputFormWidget({
+  const InputFormWidget({
     super.key,
     required this.controller,
     required this.label,
     required this.hint,
     this.width = double.infinity,
     this.isPassword = false,
+    this.color
   });
 
   @override
@@ -27,10 +29,10 @@ class _InputFormWidgetState extends State<InputFormWidget> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.label, style: labelFormTextStyle),
+        Text(widget.label, style: labelFormTextStyle.copyWith(color: widget.color ?? whiteColor)),
         SpaceHeight(8),
         TextFormField(
-          style: labelFormTextStyle,
+          style: labelFormTextStyle.copyWith(color: widget.color ?? whiteColor),
           cursorColor: whiteColor,
           obscureText: widget.isPassword,
           controller: widget.controller,
@@ -38,11 +40,11 @@ class _InputFormWidgetState extends State<InputFormWidget> {
             hintStyle: hintFormTextStyle,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: whiteColor, width: 2),
+              borderSide: BorderSide(color: widget.color ??  whiteColor, width: 2),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: whiteColor, width: 2),
+              borderSide: BorderSide(color: widget.color ??  whiteColor, width: 2),
             ),
             hintText: widget.hint,
           ),

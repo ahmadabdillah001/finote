@@ -1,3 +1,4 @@
+export 'dialogs/dialogs.dart';
 export 'logo_app.dart';
 export 'input_form_widget.dart';
 export 'custom_button_widget.dart';

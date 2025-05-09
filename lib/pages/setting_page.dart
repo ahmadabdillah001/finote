@@ -1,4 +1,5 @@
 import 'package:finote/shared/shared.dart';
+import 'package:finote/widgets/widget.dart';
 import 'package:flutter/material.dart';
 
 class SettingPage extends StatelessWidget {
@@ -20,7 +21,9 @@ class SettingPage extends StatelessWidget {
         child: Column(
           children: [
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Navigator.pushNamed(context, '/account');
+              },
               child: Card(
                 color: lightenPrimaryColor,
                 child: Padding(
@@ -37,7 +40,12 @@ class SettingPage extends StatelessWidget {
             ),
             SpaceHeight(10),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => LogoutDialog(),
+                );
+              },
               child: Card(
                 color: lightenPrimaryColor,
                 child: Padding(
@@ -46,7 +54,7 @@ class SettingPage extends StatelessWidget {
                     children: [
                       Icon(Icons.logout_outlined, size: 40, color: whiteColor),
                       SpaceWidth(15),
-                      Text('Account', style: titleListTextStyle),
+                      Text('Log Out', style: titleListTextStyle),
                     ],
                   ),
                 ),

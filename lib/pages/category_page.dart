@@ -14,8 +14,7 @@ class _CategoryPageState extends State<CategoryPage> {
   bool isIncome = true;
   @override
   Widget build(BuildContext context) {
-    final category =
-        categoryList.where((e) => e.isIncome == isIncome).toList();
+    List category = categoryList.where((e) => e.isIncome == isIncome).toList();
     return Scaffold(
       backgroundColor: primaryColor,
       appBar: AppBar(
@@ -51,7 +50,14 @@ class _CategoryPageState extends State<CategoryPage> {
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: GestureDetector(
-                    onTap: () {},
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder:
+                            (context) =>
+                                AddEditCategoryDialog(isIncome: isIncome),
+                      );
+                    },
                     child: Icon(Icons.add_rounded, size: 30, color: whiteColor),
                   ),
                 ),
@@ -68,8 +74,37 @@ class _CategoryPageState extends State<CategoryPage> {
                     isTransaction: false,
                     isIncome: isIncome,
                     description: data.name,
-                    onDelete: () {},
-                    onEdit: () {},
+                    onDelete: () async {
+                      final result = await showDialog(
+                        context: context,
+                        builder: (context) => DeleteDialog(title: 'Category'),
+                      );
+                      result
+                          ? setState(() {
+                            category.removeAt(index);
+                          })
+                          : null;
+                    },
+                    onEdit: () async {
+                      bool result = await showDialog(
+                        context: context,
+                        builder:
+                            (context) => AddEditCategoryDialog(
+                              isEdit: true,
+                              index: index,
+                              isIncome: data.isIncome,
+                              data: category,
+                            ),
+                      );
+                      result
+                          ? setState(() {
+                            category =
+                                categoryList
+                                    .where((e) => e.isIncome == isIncome)
+                                    .toList();
+                          })
+                          : null;
+                    },
                   );
                 },
               ),

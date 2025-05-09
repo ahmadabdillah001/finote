@@ -4,4 +4,7 @@ export 'splash_screen.dart';
 export 'main_page.dart';
 export 'setting_page.dart';
 export 'category_page.dart';
-export 'add_transaction_page.dart';
+export 'add_edit_transaction_page.dart';
+export 'account_page.dart';
+export 'edit_username_page.dart';
+export 'edit_password_page.dart';

@@ -1,7 +1,10 @@
 import 'package:finote/model/transaction_model.dart';
+import 'package:finote/pages/pages.dart';
 import 'package:finote/shared/shared.dart';
 import 'package:finote/widgets/widget.dart';
 import 'package:flutter/material.dart';
+
+import '../widgets/calendar_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -10,67 +13,17 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: primaryColor,
+      appBar: CalendarAppBar(
+        backButton: false,
+        accent: secondaryColor,
+        white: primaryColor,
+        black: secondaryColor,
+        onDateChanged: (value) => print(value),
+        firstDate: DateTime.now().subtract(Duration(days: 60)),
+        lastDate: DateTime.now(),
+      ),
       body: Column(
         children: [
-          Container(
-            height: 300,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.bottomLeft,
-                end: Alignment.topRight,
-                colors: [darkenSecondaryColor, secondaryColor],
-              ),
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(18),
-                bottomRight: Radius.circular(18),
-              ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                SpaceHeight(100),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    GestureDetector(
-                      onTap: () {},
-                      child: Icon(Icons.chevron_left_rounded, size: 30),
-                    ),
-                    Column(
-                      children: [
-                        Text('November', style: navTextStyle),
-                        Text(
-                          '2025',
-                          style: titleListTextStyle.copyWith(
-                            color: primaryColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {},
-                      child: Icon(Icons.chevron_right_rounded, size: 30),
-                    ),
-                  ],
-                ),
-                SpaceHeight(35),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ListView.separated(
-                      separatorBuilder: (context, index) => SpaceWidth(5),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: 12,
-                      itemBuilder:
-                          (context, index) =>
-                              DateWidget(day: 'Mon', date: 01, isActive: false),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(15),
@@ -167,8 +120,26 @@ class HomePage extends StatelessWidget {
                           isIncome: data.isIncome,
                           amount: data.amount,
                           description: data.title,
-                          onDelete: () {},
-                          onEdit: () {},
+                          onDelete: () {
+                            showDialog(
+                              context: context,
+                              builder:
+                                  (context) =>
+                                      DeleteDialog(title: 'Transaction'),
+                            );
+                          },
+                          onEdit: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => AddEditTransactionPage(
+                                      navBarTitle: 'Edit Transaction',
+                                      isEdit: true,
+                                    ),
+                              ),
+                            );
+                          },
                         );
                       },
                     ),
@@ -185,7 +156,14 @@ class HomePage extends StatelessWidget {
           backgroundColor: secondaryColor,
           child: Icon(Icons.add, color: primaryColor),
           onPressed: () {
-            Navigator.pushNamed(context, '/add-transaction');
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder:
+                    (context) =>
+                        AddEditTransactionPage(navBarTitle: 'Add Transaction'),
+              ),
+            );
           },
         ),
       ),

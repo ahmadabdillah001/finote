@@ -15,46 +15,50 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: primaryColor,
-      body: Padding(
-        padding: EdgeInsets.all(35),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            LogoApp(),
-            SpaceHeight(65),
-            isLogin ? LoginWidget() : RegisterWidget(),
-            SpaceHeight(75),
-            isLogin
-            ? Row(
+      body: Center(
+        child: Padding(
+          padding: EdgeInsets.all(35),
+          child: SingleChildScrollView(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text('Don’t have an account?', style: labelFormTextStyle),
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      isLogin = !isLogin;
-                    });
-                  },
-                  child: Text('Sign up', style: linkTextStyle),
-                ),
-              ],
-            )
-            : Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text('Already have an account?', style: labelFormTextStyle),
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      isLogin = !isLogin;
-                    });
-                  },
-                  child: Text('Log in', style: linkTextStyle),
+                LogoApp(),
+                SpaceHeight(65),
+                isLogin ? LoginWidget() : RegisterWidget(),
+                SpaceHeight(75),
+                isLogin
+                ? Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Don’t have an account?', style: labelFormTextStyle),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          isLogin = !isLogin;
+                        });
+                      },
+                      child: Text('Sign up', style: linkTextStyle),
+                    ),
+                  ],
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Already have an account?', style: labelFormTextStyle),
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          isLogin = !isLogin;
+                        });
+                      },
+                      child: Text('Log in', style: linkTextStyle),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

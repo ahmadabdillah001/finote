@@ -19,7 +19,9 @@ class MyApp extends StatelessWidget {
         '/login-register': (context) => const LoginRegisterPage(),
         '/main': (context) => const MainPage(),
         '/home': (context) => const HomePage(),
-        '/add-transaction': (context) => const AddTransactionPage(),
+        '/account': (context) => const AccountPage(),
+        '/edit-username': (context) => const EditUsernamePage(),
+        '/edit-password': (context) => const EditPasswordPage(),
       },
     );
   }
