@@ -14,14 +14,14 @@ deploy-web:
  flutter pub get
 
  @echo "Building..."
- flutter build web --base-href $(BASE_HREF) --release
+ flutter build web --base-href /finote-web-app/ --release
 
  @echo "Deploying..."
  cd build/web && \
  git init && \
  git add . && \
- git commit -m "Deploy version $(BUILD_VERSION)" && \
- git remote add origin $(GITHUB_REPO) && \
+ git commit -m "Deploy version 2.1" && \
+ git remote add origin https://github.com/ahmadabdillah001/finote-web-app.git && \
  git push -u --force origin master
 
  cd ../../

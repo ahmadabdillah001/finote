@@ -52,7 +52,7 @@ class LogoutDialog extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
-                    'Delete',
+                    'Logout',
                     style: buttonTextStyle.copyWith(color: whiteColor),
                   ),
                 ),

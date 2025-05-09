@@ -33,7 +33,7 @@ class _InputFormWidgetState extends State<InputFormWidget> {
         SpaceHeight(8),
         TextFormField(
           style: labelFormTextStyle.copyWith(color: widget.color ?? whiteColor),
-          cursorColor: whiteColor,
+          cursorColor: widget.color ??  whiteColor,
           obscureText: widget.isPassword,
           controller: widget.controller,
           decoration: InputDecoration(
