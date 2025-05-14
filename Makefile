@@ -20,7 +20,7 @@ deploy-web:
  cd build/web && \
  git init && \
  git add . && \
- git commit -m "Deploy version 2.1" && \
+ git commit -m "Deploy version 2.2" && \
  git remote add origin https://github.com/ahmadabdillah001/finote-web-app.git && \
  git push -u --force origin master
 

@@ -1,4 +1,5 @@
 import 'package:finote/shared/shared.dart';
+import 'package:finote/utils/session_manager.dart';
 import 'package:finote/widgets/widget.dart';
 import 'package:flutter/material.dart';
 
@@ -40,10 +41,18 @@ class SettingPage extends StatelessWidget {
             ),
             SpaceHeight(10),
             GestureDetector(
-              onTap: () {
-                showDialog(
+              onTap: () async {
+                final result = await showDialog(
                   context: context,
                   builder: (context) => LogoutDialog(),
+                );
+                if (result == false && result == null) return;
+                await Future.delayed(const Duration(seconds: 1));
+                await SessionManager().removeSession();
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  '/login-register',
+                  (route) => false,
                 );
               },
               child: Card(

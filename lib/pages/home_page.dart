@@ -4,8 +4,6 @@ import 'package:finote/shared/shared.dart';
 import 'package:finote/widgets/widget.dart';
 import 'package:flutter/material.dart';
 
-import '../widgets/calendar_widget.dart';
-
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
