@@ -1,16 +1,20 @@
-import 'package:finote/model/category_model_test.dart';
+import 'package:finote/bloc/category_bloc.dart';
+import 'package:finote/model/category_model.dart';
 import 'package:finote/shared/shared.dart';
 import 'package:finote/widgets/widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddEditCategoryDialog extends StatefulWidget {
   final bool isEdit;
+  final List<CategoryModel> categoryList;
   final int? index;
   final bool isIncome;
-  final List<dynamic>? data;
+  final CategoryModel? data;
   const AddEditCategoryDialog({
     super.key,
     this.isEdit = false,
+    required this.categoryList,
     required this.isIncome,
     this.data,
     this.index,
@@ -22,26 +26,17 @@ class AddEditCategoryDialog extends StatefulWidget {
 
 class _AddEditCategoryDialogState extends State<AddEditCategoryDialog> {
   TextEditingController inputController = TextEditingController();
-  void editData() {
-    setState(() {
-      widget.data![widget.index!] = CategoryModel(
-        name: inputController.text,
-        isIncome: widget.isIncome,
-      );
-    });
-  }
 
   @override
   void initState() {
     super.initState();
     if (widget.isEdit) {
-      inputController.text = widget.data![widget.index!].name;
+      inputController.text = widget.data!.nama;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final category = categoryList;
     return AlertDialog(
       backgroundColor: secondaryColor,
       content: Column(
@@ -57,23 +52,6 @@ class _AddEditCategoryDialogState extends State<AddEditCategoryDialog> {
               hint: widget.isEdit ? 'Edit Category' : 'Add Category',
               color: primaryColor,
             ),
-            //   TextFormField(
-            //   controller: controller,
-            //   style: inputControllerStyle,
-            //   decoration: InputDecoration(
-            //     hintText: "Remark",
-            //     filled: true,
-            //     fillColor: Colors.white,
-            //     border: OutlineInputBorder(
-            //       borderRadius: BorderRadius.circular(12),
-            //       borderSide: BorderSide.none,
-            //     ),
-            //     contentPadding: const EdgeInsets.symmetric(
-            //       horizontal: 20,
-            //       vertical: 14,
-            //     ),
-            //   ),
-            // ),
           ),
           SpaceHeight(20),
           Row(
@@ -81,7 +59,7 @@ class _AddEditCategoryDialogState extends State<AddEditCategoryDialog> {
             children: [
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: whiteColor,
+                  backgroundColor: redColor,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -90,43 +68,89 @@ class _AddEditCategoryDialogState extends State<AddEditCategoryDialog> {
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: Text(
                     'Cancel',
-                    style: buttonTextStyle.copyWith(color: primaryColor),
-                  ),
-                ),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-              SpaceWidth(10),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: redColor,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () {
-                  inputController.text.isEmpty
-                      ? ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Input must not be empty'),
-                        ),
-                      )
-                      : widget.isEdit == false
-                      ? category.add(
-                        CategoryModel(
-                          name: inputController.text,
-                          isIncome: widget.isIncome,
-                        ),
-                      )
-                      : editData();
-                  Navigator.pop(context, true);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Text(
-                    widget.isEdit ? 'Save' : 'Add',
                     style: buttonTextStyle.copyWith(color: whiteColor),
                   ),
                 ),
+                onPressed: () => Navigator.pop(context),
+              ),
+              SpaceWidth(10),
+              BlocConsumer<CategoryBloc, CategoryState>(
+                listener: (context, state) {
+                  if (state is CategoryCreateSuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Category Added')),
+                    );
+                    Navigator.pop(context);
+                  } else if (state is CategoryUpdateSuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Category Updated')),
+                    );
+                    Navigator.pop(context);
+                  } else if (state is CategoryFailed) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text(state.message)));
+                  }
+                },
+                builder: (context, state) {
+                  if (state is CategoryLoading) {
+                    return CircularProgressIndicator(color: primaryColor);
+                  }
+                  return ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: whiteColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      final createData = CategoryModel(
+                        nama: inputController.text,
+                        jenis: widget.isIncome ? 'income' : 'expanse',
+                      );
+                      final updateData = CategoryModel(
+                        id: widget.data!.id,
+                        nama: inputController.text,
+                        jenis: widget.isIncome ? 'income' : 'expanse',
+                      );
+                      if (widget.categoryList.any(
+                        (e) => e.nama == inputController.text,
+                      )) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Category already exist'),
+                          ),
+                        );
+                        return;
+                      }
+                      if (inputController.text.isEmpty) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Input must not be empty'),
+                          ),
+                        );
+                        return;
+                      } else {
+                        !widget.isEdit
+                            ? context.read<CategoryBloc>().add(
+                              CreateCategories(createData),
+                            )
+                            : context.read<CategoryBloc>().add(
+                              UpdateCategories(updateData),
+                            );
+                      }
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Text(
+                        widget.isEdit ? 'Save' : 'Add',
+                        style: buttonTextStyle.copyWith(color: primaryColor),
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

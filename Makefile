@@ -3,7 +3,7 @@
 # Update variables
 BASE_HREF = '/finote-web-app/'
 GITHUB_REPO = https://github.com/ahmadabdillah001/finote-web-app.git
-BUILD_VERSION := $(shell grep 'version:' pubspec.yaml | awk '{print $$2}')
+BUILD_VERSION = $(shell grep 'version:' pubspec.yaml | awk '{print $2}')
 
 # Build command
 deploy-web:
@@ -20,8 +20,8 @@ deploy-web:
  cd build/web && \
  git init && \
  git add . && \
- git commit -m "Deploy version 2.2" && \
- git remote add origin https://github.com/ahmadabdillah001/finote-web-app.git && \
+ git commit -m "Deploy version ${BUILD_VERSION}" && \
+ git remote add origin ${GITHUB_REPO} && \
  git push -u --force origin master
 
  cd ../../

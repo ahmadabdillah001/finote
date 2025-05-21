@@ -1,66 +1,63 @@
 class TransactionModel {
   int? id;
-  String title;
-  int amount;
-  bool isIncome;
-  String category;
+  int? userId;
+  int categoryId;
+  String judul;
+  int jumlah;
+  String tanggal;
+  String jenis;
+  String? keterangan;
 
   TransactionModel({
     this.id,
-    required this.title,
-    required this.amount,
-    required this.isIncome,
-    required this.category,
+    this.userId,
+    required this.categoryId,
+    required this.judul,
+    required this.jumlah,
+    required this.tanggal,
+    required this.jenis,
+    this.keterangan,
   });
+
+  factory TransactionModel.fromJson(Map<String, dynamic> json) => TransactionModel(
+    id: json['id'],
+    userId: json['user_id'],
+    categoryId: json['category_id'],
+    judul: json['judul'],
+    jumlah: json['jumlah'],
+    tanggal: json['tanggal'],
+    jenis: json['jenis'],
+    keterangan: json['keterangan'],
+  );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'user_id': userId,
+    'category_id': categoryId,
+    'judul': judul,
+    'jumlah': jumlah,
+    'tanggal': tanggal,
+    'jenis': jenis,
+    'keterangan': keterangan,
+  };
 }
 
-List<TransactionModel> transactionList = [
-  TransactionModel(
-    title: 'Beli Motor',
-    amount: 45000000,
-    isIncome: false,
-    category: 'Pengeluaran',
-  ),
-  TransactionModel(
-    title: 'Beli Buku',
-    amount: 300000,
-    isIncome: false,
-    category: 'Pengeluaran',
-  ),
-  TransactionModel(
-    title: 'Gaji Freelance',
-    amount: 65000000,
-    isIncome: true,
-    category: 'Gaji Freelance',
-  ),
-  TransactionModel(
-    title: 'Joki Tugas Kuliah',
-    amount: 10000000,
-    isIncome: true,
-    category: 'Gaji Freelance',
-  ),
-  TransactionModel(
-    title: 'Beli Laptop',
-    amount: 30000000,
-    isIncome: false,
-    category: 'Pengeluaran',
-  ),
-  TransactionModel(
-    title: 'Bisnis FnB',
-    amount: 200000000,
-    isIncome: true,
-    category: 'Pengeluaran',
-  ),
-  TransactionModel(
-    title: 'Bangun Bisni Clothing',
-    amount: 70000000,
-    isIncome: false,
-    category: 'Pengeluaran',
-  ),
-  TransactionModel(
-    title: 'Beli Camera',
-    amount: 15000000,
-    isIncome: false,
-    category: 'Pengeluaran',
-  ),
-];
+// === response data ===
+// {
+//     "status": "success",
+//     "message": "get all transaction successfully",
+//     "data": [
+//         {
+//             "id": 1,
+//             "user_id": 2,
+//             "category_id": 2,
+//             "judul": "Orderan Aplikasi",
+//             "jumlah": 48000000,
+//             "tanggal": "2025-07-02",
+//             "jenis": "income",
+//             "keterangan": "Gaji tetap",
+//             "created_at": "2025-05-14T10:03:41.000000Z",
+//             "updated_at": "2025-05-14T10:03:41.000000Z"
+//         }
+//     ]
+// }

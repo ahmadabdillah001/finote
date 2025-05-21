@@ -8,6 +8,7 @@ class InputFormWidget extends StatefulWidget {
   final double width;
   final bool isPassword;
   final Color? color;
+  final bool isAmount;
 
   const InputFormWidget({
     super.key,
@@ -16,7 +17,8 @@ class InputFormWidget extends StatefulWidget {
     required this.hint,
     this.width = double.infinity,
     this.isPassword = false,
-    this.color
+    this.color,
+    this.isAmount = false
   });
 
   @override
@@ -32,6 +34,7 @@ class _InputFormWidgetState extends State<InputFormWidget> {
         Text(widget.label, style: labelFormTextStyle.copyWith(color: widget.color ?? whiteColor)),
         SpaceHeight(8),
         TextFormField(
+          keyboardType: widget.isAmount ? TextInputType.number : TextInputType.text,
           style: labelFormTextStyle.copyWith(color: widget.color ?? whiteColor),
           cursorColor: widget.color ??  whiteColor,
           obscureText: widget.isPassword,

@@ -550,8 +550,8 @@ class _CalendarAppBarState extends State<CalendarAppBar> {
                   end: Alignment.topRight,
                   colors: [darkenSecondaryColor, secondaryColor],
                 ),
-                borderRadius: BorderRadius.all(Radius.circular(20)
-                )
+                // borderRadius: BorderRadius.all(Radius.circular(20)
+                // )
               ),
             ),
           ),

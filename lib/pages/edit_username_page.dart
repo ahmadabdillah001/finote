@@ -10,7 +10,7 @@ class EditUsernamePage extends StatelessWidget {
   Widget build(BuildContext context) {
     TextEditingController newUsernameController = TextEditingController();
     TextEditingController passwordController = TextEditingController();
-    TextEditingController passwordConfirmController = TextEditingController();
+    // TextEditingController passwordConfirmController = TextEditingController();
     return Scaffold(
       backgroundColor: primaryColor,
       appBar: AppBar(

@@ -1,6 +1,5 @@
 import 'package:finote/pages/pages.dart';
 import 'package:finote/shared/shared.dart';
-import 'package:finote/widgets/widget.dart';
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {

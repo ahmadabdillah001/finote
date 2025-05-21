@@ -1,21 +1,24 @@
-import 'package:finote/model/category_model_test.dart';
+import 'package:finote/bloc/transaction_bloc.dart';
+import 'package:finote/model/category_model.dart';
 import 'package:finote/model/transaction_model.dart';
 import 'package:finote/shared/shared.dart';
 import 'package:finote/widgets/widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 
 class AddEditTransactionPage extends StatefulWidget {
   final String navBarTitle;
   final bool isEdit;
-  final List<TransactionModel>? data;
-  final int? index;
+  final List<CategoryModel> categoryList;
+  final TransactionModel? transactionData;
 
   const AddEditTransactionPage({
     super.key,
     required this.navBarTitle,
+    required this.categoryList,
     this.isEdit = false,
-    this.data,
-    this.index,
+    this.transactionData,
   });
 
   @override
@@ -24,26 +27,34 @@ class AddEditTransactionPage extends StatefulWidget {
 
 class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
   bool isIncome = false;
-  TextEditingController amountController = TextEditingController();
   String? categoryController = '- select category -';
+  TextEditingController nameController = TextEditingController();
+  TextEditingController amountController = TextEditingController();
   TextEditingController dateController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  final data = categoryList;
+  // final data = categoryList;
   List categories = ['- select category -'];
   @override
   void initState() {
     super.initState();
     if (widget.isEdit) {
-      final finalData = widget.data![widget.index!];
-
-      isIncome = finalData.isIncome;
-      amountController = TextEditingController(
-        text: finalData.amount.toString(),
-      );
-      categoryController = finalData.category;
+      getLatesData();
     }
     updateCategories();
+  }
+
+  void getLatesData() async {
+    final data = widget.transactionData!;
+    final latesCategory =
+        widget.categoryList.firstWhere((e) => e.id == data.categoryId).nama;
+
+    nameController = TextEditingController(text: data.judul);
+    isIncome = widget.transactionData!.jenis == 'income' ? true : false;
+    categoryController = latesCategory;
+    dateController = TextEditingController(text: data.tanggal);
+    amountController = TextEditingController(text: data.jumlah.toString());
+    descriptionController = TextEditingController(text: data.keterangan);
   }
 
   void updateCategories() {
@@ -52,9 +63,9 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
     }
     categories = ['- select category -'];
     categories.addAll(
-      categoryList
-          .where((e) => e.isIncome == isIncome)
-          .map((e) => e.name)
+      widget.categoryList
+          .where((e) => e.jenis == (isIncome ? 'income' : 'expanse'))
+          .map((e) => e.nama)
           .toList(),
     );
   }
@@ -109,53 +120,109 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
               ),
               SpaceHeight(15),
               InputFormWidget(
+                controller: nameController,
+                label: 'Title',
+                hint: 'xxxx',
+              ),
+              SpaceHeight(15),
+              InputFormWidget(
+                isAmount: true,
                 controller: amountController,
                 label: 'Amount',
                 hint: 'total amount',
               ),
               SpaceHeight(15),
-              DropdownButtonFormField<String>(
-                dropdownColor: primaryColor,
-                value: categoryController,
-                decoration: InputDecoration(
-                  hintStyle: hintFormTextStyle,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: whiteColor, width: 2),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Category',
+                    style: labelFormTextStyle.copyWith(color: whiteColor),
                   ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: whiteColor, width: 2),
+                  SpaceHeight(8),
+                  DropdownButtonFormField<String>(
+                    dropdownColor: primaryColor,
+                    value: categoryController,
+                    decoration: InputDecoration(
+                      hintStyle: hintFormTextStyle,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: whiteColor, width: 2),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: whiteColor, width: 2),
+                      ),
+                      hintText: '- select category -',
+                    ),
+                    style: hintFormTextStyle,
+                    items:
+                        categories.map((item) {
+                          return DropdownMenuItem<String>(
+                            value: item.toString(),
+                            child: Text(
+                              item.toString(),
+                              style: labelFormTextStyle.copyWith(
+                                color:
+                                    item == '- select category -'
+                                        ? greyColor
+                                        : whiteColor,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                    onChanged: (value) async {
+                      setState(() {
+                        categoryController = value;
+                      });
+                    },
                   ),
-                  hintText: '- select category -',
-                ),
-                style: hintFormTextStyle,
-                items:
-                    categories.map((item) {
-                      return DropdownMenuItem<String>(
-                        value: item.toString(),
-                        child: Text(
-                          item.toString(),
-                          style: labelFormTextStyle.copyWith(
-                            color:
-                                item == '- select category -'
-                                    ? greyColor
-                                    : whiteColor,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                onChanged: (value) async {
-                  setState(() {
-                    categoryController = value;
-                  });
-                },
+                ],
               ),
               SpaceHeight(15),
-              InputFormWidget(
-                controller: dateController,
-                label: 'Date',
-                hint: 'dd-mm-yyyy',
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Date',
+                    style: labelFormTextStyle.copyWith(color: whiteColor),
+                  ),
+                  SpaceHeight(8),
+                  TextField(
+                    readOnly: true,
+                    style: labelFormTextStyle.copyWith(color: whiteColor),
+                    cursorColor: whiteColor,
+                    controller: dateController,
+                    decoration: InputDecoration(
+                      hintStyle: hintFormTextStyle,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: whiteColor, width: 2),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: whiteColor, width: 2),
+                      ),
+                      hintText: 'yyyy-mm-dd',
+                    ),
+                    onTap: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime.now(),
+                        barrierColor: primaryColor,
+                      );
+
+                      if (pickedDate != null) {
+                        final dateFormated = DateFormat(
+                          'yyyy-MM-dd',
+                        ).format(pickedDate);
+                        dateController.text = dateFormated;
+                      }
+                    },
+                  ),
+                ],
               ),
               SpaceHeight(15),
               InputFormWidget(
@@ -164,15 +231,65 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                 hint: 'description',
               ),
               SpaceHeight(30),
-              CustomButtonWidget(
-                title:
-                    widget.isEdit
-                        ? 'Save Change'
-                        : isIncome
-                        ? 'Add Income'
-                        : 'Add Expanse',
-                width: double.infinity,
-                onPressed: () {},
+              BlocConsumer<TransactionBloc, TransactionState>(
+                listener: (context, state) {
+                  if (state is TransactionCreateSuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Transaction Added')),
+                    );
+                    Navigator.pop(context);
+                  } else if (state is TransactionUpdateSuccess) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Transaction Updated')),
+                    );
+                    Navigator.pop(context);
+                  } else if (state is TransactionFailed) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          widget.isEdit
+                              ? 'Failed Update Transaction'
+                              : 'Failed Add Transaction',
+                        ),
+                      ),
+                    );
+                  }
+                },
+                builder: (context, state) {
+                  if (state is TransactionLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return CustomButtonWidget(
+                    title:
+                        widget.isEdit
+                            ? 'Save Change'
+                            : isIncome
+                            ? 'Add Income'
+                            : 'Add Expanse',
+                    width: double.infinity,
+                    onPressed: () {
+                      final data = TransactionModel(
+                        categoryId:
+                            widget.categoryList
+                                .firstWhere((e) => e.nama == categoryController)
+                                .id ??
+                            0,
+                        judul: nameController.text,
+                        jumlah: int.parse(amountController.text),
+                        tanggal: dateController.text,
+                        jenis: isIncome ? 'income' : 'expanse',
+                        keterangan: descriptionController.text,
+                      );
+                      widget.isEdit
+                          ? context.read<TransactionBloc>().add(
+                            UpdateTransaction(data),
+                          )
+                          : context.read<TransactionBloc>().add(
+                            CreateTransaction(data),
+                          );
+                    },
+                  );
+                },
               ),
             ],
           ),
