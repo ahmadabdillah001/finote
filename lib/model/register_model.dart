@@ -1,25 +1,20 @@
 class RegisterModel {
   int? id;
   String? tokenData;
-  String name;
-  String email;
-  String password;
+  String? name;
+  String? email;
+  String? password;
 
   RegisterModel({
     this.id,
     this.tokenData,
-    required this.name,
-    required this.email,
-    required this.password,
+    this.name,
+    this.email,
+    this.password,
   });
 
-  factory RegisterModel.fromJson(Map<String, dynamic> json) => RegisterModel(
-    id: json['id'],
-    tokenData: json['token_type'],
-    name: json['name'],
-    email: json['email'],
-    password: json['password'],
-  );
+  factory RegisterModel.fromJson(Map<String, dynamic> json) =>
+      RegisterModel(tokenData: json['access_token']);
 
   Map<String, dynamic> toJson() => {
     'name': name,

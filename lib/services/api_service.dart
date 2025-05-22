@@ -5,6 +5,7 @@ import 'package:finote/model/login_request_model.dart';
 import 'package:finote/model/login_response_model.dart';
 import 'package:finote/model/register_model.dart';
 import 'package:finote/model/transaction_model.dart';
+import 'package:finote/model/user_model.dart';
 import 'package:finote/utils/session_manager.dart';
 
 class ApiService {
@@ -23,6 +24,12 @@ class ApiService {
   Future<RegisterModel> register(RegisterModel requestBody) async {
     final response = await dio.post(
       '$baseUrl/register',
+      options: Options(
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      ),
       data: requestBody.toJson(),
     );
     return RegisterModel.fromJson(response.data);
@@ -110,7 +117,7 @@ class ApiService {
         },
       ),
     );
-    return response.data['data'];
+    return response.data['message'];
   }
 
   // === Transaction Model ===
@@ -193,6 +200,64 @@ class ApiService {
       '$baseUrl/transactions/$id',
       options: Options(headers: {'Authorization': 'Bearer $tokenActive'}),
     );
-    return response.data['data'];
+    return response.data['message'];
+  }
+
+  // === User Model ===
+
+  // get current user
+  Future<UserModel> getCurrentUser() async {
+    final tokenActive = await SessionManager().getAccessToken();
+    final response = await dio.get(
+      '$baseUrl/user',
+      options: Options(
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $tokenActive',
+        },
+      ),
+    );
+    return UserModel.fromJson(response.data['data']);
+  }
+
+  // update current user
+  Future<String> updateCurrentUsername(
+    String newUsername,
+    String validatePassword,
+  ) async {
+    final tokenActive = await SessionManager().getAccessToken();
+    final response = await dio.put(
+      '$baseUrl/user',
+      options: Options(
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $tokenActive',
+        },
+      ),
+      data: {'name': newUsername, 'validate_password': validatePassword},
+    );
+    return response.data['message'];
+  }
+
+  // update current user password
+  Future<String> updateCurrentPassword(
+    String newPassword,
+    String validatePassword,
+  ) async {
+    final tokenActive = await SessionManager().getAccessToken();
+    final response = await dio.put(
+      '$baseUrl/user',
+      options: Options(
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $tokenActive',
+        },
+      ),
+      data: {'password': newPassword, 'validate_password': validatePassword},
+    );
+    return response.data['message'];
   }
 }

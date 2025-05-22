@@ -16,8 +16,9 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       final result = await repository.login(event.requestBody);
       result.fold((errorMessage) => emit(LoginFailed(errorMessage)), (
         loginData,
-      ) {
+      ) async {
         final sesionManager = SessionManager();
+        await sesionManager.removeSession();
         sesionManager.saveSession(loginData.accessToken);
         emit(LoginSuccess(loginData));
       });

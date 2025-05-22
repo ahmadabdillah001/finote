@@ -68,7 +68,9 @@ class _LoginWidgetState extends State<LoginWidget> {
           },
           builder: (context, state) {
             if (state is LoginLoading) {
-              return Center(child: CircularProgressIndicator());
+              return Center(
+                child: CircularProgressIndicator(color: secondaryColor),
+              );
             }
             return CustomButtonWidget(
               title: 'Login',

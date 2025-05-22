@@ -87,9 +87,16 @@ class _AddEditCategoryDialogState extends State<AddEditCategoryDialog> {
                     );
                     Navigator.pop(context);
                   } else if (state is CategoryFailed) {
-                    ScaffoldMessenger.of(
-                      context,
-                    ).showSnackBar(SnackBar(content: Text(state.message)));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          widget.isEdit
+                              ? 'Failed Edit Category'
+                              : 'Failed Create Category',
+                        ),
+                      ),
+                    );
+                    Navigator.pop(context);
                   }
                 },
                 builder: (context, state) {
@@ -104,42 +111,43 @@ class _AddEditCategoryDialogState extends State<AddEditCategoryDialog> {
                       ),
                     ),
                     onPressed: () {
-                      final createData = CategoryModel(
-                        nama: inputController.text,
-                        jenis: widget.isIncome ? 'income' : 'expanse',
-                      );
-                      final updateData = CategoryModel(
-                        id: widget.data!.id,
-                        nama: inputController.text,
-                        jenis: widget.isIncome ? 'income' : 'expanse',
-                      );
                       if (widget.categoryList.any(
                         (e) => e.nama == inputController.text,
                       )) {
-                        Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Category already exist'),
                           ),
                         );
+                        Navigator.pop(context);
                         return;
                       }
                       if (inputController.text.isEmpty) {
-                        Navigator.pop(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Input must not be empty'),
                           ),
                         );
+                        Navigator.pop(context);
                         return;
+                      }
+                      if (widget.isEdit == false) {
+                        final createData = CategoryModel(
+                          nama: inputController.text,
+                          jenis: widget.isIncome ? 'income' : 'expanse',
+                        );
+                        context.read<CategoryBloc>().add(
+                          CreateCategories(createData),
+                        );
                       } else {
-                        !widget.isEdit
-                            ? context.read<CategoryBloc>().add(
-                              CreateCategories(createData),
-                            )
-                            : context.read<CategoryBloc>().add(
-                              UpdateCategories(updateData),
-                            );
+                        final updateData = CategoryModel(
+                          id: widget.data!.id,
+                          nama: inputController.text,
+                          jenis: widget.isIncome ? 'income' : 'expanse',
+                        );
+                        context.read<CategoryBloc>().add(
+                          UpdateCategories(updateData),
+                        );
                       }
                     },
                     child: Padding(

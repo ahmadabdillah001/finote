@@ -52,7 +52,7 @@ class _LoginRegisterPageState extends State<LoginRegisterPage> {
                           isLogin = !isLogin;
                         });
                       },
-                      child: Text('Log in', style: linkTextStyle),
+                      child: Text('Sign in', style: linkTextStyle),
                     ),
                   ],
                 ),

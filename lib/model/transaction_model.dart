@@ -31,8 +31,6 @@ class TransactionModel {
   );
 
   Map<String, dynamic> toJson() => {
-    'id': id,
-    'user_id': userId,
     'category_id': categoryId,
     'judul': judul,
     'jumlah': jumlah,

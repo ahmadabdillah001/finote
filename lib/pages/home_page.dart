@@ -22,11 +22,21 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     context.read<TransactionBloc>().add(GetTransactions());
     context.read<CategoryBloc>().add(GetCategories());
+    if (selectedDate == '') {
+      selectedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    }
   }
 
-  DateTime selectedDate = DateTime.now();
   final apiService = ApiService();
   List<TransactionModel> transactionList = [];
+
+  String selectedDate = '';
+
+  void refreshDate(DateTime date) {
+    setState(() {
+      selectedDate = DateFormat('yyyy-MM-dd').format(date);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +52,11 @@ class _HomePageState extends State<HomePage> {
         }
         if (state is TransactionGetSuccess) {
           final getThisMonth = DateFormat('yyyy-MM').format(DateTime.now());
-          final getThisDay = DateFormat('yyyy-MM-dd').format(DateTime.now());
           final transactionData = state.responseData;
 
           transactionList =
               transactionData
-                  .where((e) => e.tanggal.substring(0, 10) == getThisDay)
+                  .where((e) => e.tanggal.substring(0, 10) == selectedDate)
                   .toList();
 
           final transactionThisMonthList =
@@ -56,14 +65,23 @@ class _HomePageState extends State<HomePage> {
                   .toList();
 
           // total income
-          final totalIncome = transactionThisMonthList
+          int totalIncome = transactionThisMonthList
               .where((t) => t.jenis == 'income') // filter income
               .fold(0, (sum, t) => sum + t.jumlah);
 
           // total expanse
-          final totalExpanse = transactionThisMonthList
+          int totalExpanse = transactionThisMonthList
               .where((t) => t.jenis == 'expanse') // filter expanse
               .fold(0, (sum, t) => sum + t.jumlah);
+
+          // short income and expanse if over
+          final totalIsOver =
+              totalExpanse.bitLength > 8 || totalIncome.bitLength > 8;
+
+          if (totalIsOver) {
+            totalIncome = totalIncome ~/ 1000;
+            totalExpanse = totalExpanse ~/ 1000;
+          }
 
           return BlocBuilder<CategoryBloc, CategoryState>(
             builder: (context, state) {
@@ -79,23 +97,13 @@ class _HomePageState extends State<HomePage> {
                 return Scaffold(
                   backgroundColor: primaryColor,
                   appBar: CalendarAppBar(
-                    selectedDate: selectedDate,
+                    selectedDate: DateTime.parse(selectedDate),
                     backButton: false,
                     accent: secondaryColor,
                     white: primaryColor,
                     black: secondaryColor,
                     onDateChanged: (value) {
-                      selectedDate = value;
-                      final getThisDay = DateFormat('yyyy-MM-dd').format(value);
-                      setState(() {
-                        transactionList =
-                            transactionData
-                                .where(
-                                  (e) =>
-                                      e.tanggal.substring(0, 10) == getThisDay,
-                                )
-                                .toList();
-                      });
+                      refreshDate(value);
                     },
                     firstDate: DateTime.now().subtract(Duration(days: 60)),
                     lastDate: DateTime.now(),
@@ -116,87 +124,116 @@ class _HomePageState extends State<HomePage> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Padding(
-                                  padding: EdgeInsets.all(15),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                  padding:
+                                      totalIsOver
+                                          ? EdgeInsets.only(
+                                            left: 15,
+                                            right: 15,
+                                            top: 15,
+                                            bottom: 10,
+                                          )
+                                          : EdgeInsets.all(15),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
-                                          Container(
-                                            padding: EdgeInsets.all(3),
-                                            decoration: BoxDecoration(
-                                              color: greenColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: Icon(
-                                              Icons
-                                                  .keyboard_double_arrow_down_rounded,
-                                              size: 30,
-                                              color: whiteColor,
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.all(3),
+                                                  decoration: BoxDecoration(
+                                                    color: greenColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons
+                                                        .keyboard_double_arrow_down_rounded,
+                                                    size: 30,
+                                                    color: whiteColor,
+                                                  ),
+                                                ),
+                                                SpaceWidth(10),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Income',
+                                                      style:
+                                                          subTitleListTextStyle,
+                                                    ),
+                                                    SpaceHeight(2),
+                                                    Text(
+                                                      totalIncome
+                                                          .currencyFormatRp,
+                                                      style: titleListTextStyle
+                                                          .copyWith(
+                                                            fontSize: 16,
+                                                          ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          SpaceWidth(10),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Income',
-                                                style: subTitleListTextStyle,
-                                              ),
-                                              SpaceHeight(2),
-                                              Text(
-                                                totalIncome.currencyFormatRp,
-                                                style: titleListTextStyle
-                                                    .copyWith(fontSize: 16),
-                                              ),
-                                            ],
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.all(3),
+                                                  decoration: BoxDecoration(
+                                                    color: redColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                  ),
+                                                  child: Icon(
+                                                    Icons
+                                                        .keyboard_double_arrow_up_rounded,
+                                                    size: 30,
+                                                    color: whiteColor,
+                                                  ),
+                                                ),
+                                                SpaceWidth(10),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      'Expanse',
+                                                      style:
+                                                          subTitleListTextStyle,
+                                                    ),
+                                                    SpaceHeight(2),
+                                                    Text(
+                                                      totalExpanse
+                                                          .currencyFormatRp,
+                                                      style: titleListTextStyle
+                                                          .copyWith(
+                                                            fontSize: 16,
+                                                          ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                          totalIncome == 0
-                                              ? SpaceWidth(45)
-                                              : SizedBox(),
                                         ],
                                       ),
-                                      Row(
-                                        children: [
-                                          Container(
-                                            padding: EdgeInsets.all(3),
-                                            decoration: BoxDecoration(
-                                              color: redColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            child: Icon(
-                                              Icons
-                                                  .keyboard_double_arrow_up_rounded,
-                                              size: 30,
-                                              color: whiteColor,
-                                            ),
-                                          ),
-                                          SpaceWidth(10),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                'Expanse',
-                                                style: subTitleListTextStyle,
-                                              ),
-                                              SpaceHeight(2),
-                                              Text(
-                                                totalExpanse.currencyFormatRp,
-                                                style: titleListTextStyle
-                                                    .copyWith(fontSize: 16),
-                                              ),
-                                            ],
-                                          ),
-                                          totalExpanse == 0
-                                              ? SpaceWidth(45)
-                                              : SizedBox(),
-                                        ],
-                                      ),
+                                      SpaceHeight(totalIsOver ? 5 : 0),
+                                      totalIsOver
+                                          ? Text(
+                                            '*Rp Thousand',
+                                            style: subTitleListTextStyle,
+                                          )
+                                          : Container(),
                                     ],
                                   ),
                                 ),
@@ -204,57 +241,64 @@ class _HomePageState extends State<HomePage> {
                               SpaceHeight(20),
                               Text('Transactions', style: lableListTextStyle),
                               SpaceHeight(20),
-                              Expanded(
-                                child:
-                                    transactionList == []
-                                        ? Center(child: Text('No Transaction'))
-                                        : ListView.separated(
-                                          padding: EdgeInsets.only(top: 0),
-                                          itemCount: transactionList.length,
-                                          separatorBuilder:
-                                              (context, index) =>
-                                                  SpaceHeight(10),
-                                          itemBuilder: (context, index) {
-                                            final data = transactionList[index];
-                                            return TransactionCardWidget(
-                                              isIncome:
-                                                  data.jenis == 'income'
-                                                      ? true
-                                                      : false,
-                                              amount: data.jumlah,
-                                              description: data.judul,
-                                              onDelete: () {
-                                                showDialog(
-                                                  context: context,
-                                                  builder:
-                                                      (context) => DeleteDialog(
-                                                        title: 'Transaction',
-                                                      ),
-                                                );
-                                              },
-                                              onEdit: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder:
-                                                        (
-                                                          context,
-                                                        ) => AddEditTransactionPage(
-                                                          categoryList:
-                                                              state
-                                                                  .responseBody,
-                                                          navBarTitle:
-                                                              'Edit Transaction',
-                                                          isEdit: true,
-                                                          transactionData: data,
-                                                        ),
+                              transactionList.isEmpty
+                                  ? SizedBox(
+                                    width: double.infinity,
+                                    height: 100,
+                                    child: Center(
+                                      child: Text(
+                                        'Transaction is empty',
+                                        style: subTitleListTextStyle,
+                                      ),
+                                    ),
+                                  )
+                                  : Expanded(
+                                    child: ListView.separated(
+                                      padding: EdgeInsets.only(top: 0),
+                                      itemCount: transactionList.length,
+                                      separatorBuilder:
+                                          (context, index) => SpaceHeight(10),
+                                      itemBuilder: (context, index) {
+                                        final data = transactionList[index];
+                                        return TransactionCardWidget(
+                                          isIncome:
+                                              data.jenis == 'income'
+                                                  ? true
+                                                  : false,
+                                          amount: data.jumlah,
+                                          description: data.judul,
+                                          onDelete: () {
+                                            showDialog(
+                                              context: context,
+                                              builder:
+                                                  (context) => DeleteDialog(
+                                                    id: data.id!,
+                                                    isTransaction: true,
                                                   ),
-                                                );
-                                              },
                                             );
                                           },
-                                        ),
-                              ),
+                                          onEdit: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder:
+                                                    (
+                                                      context,
+                                                    ) => AddEditTransactionPage(
+                                                      categoryList:
+                                                          state.responseBody,
+                                                      navBarTitle:
+                                                          'Edit Transaction',
+                                                      isEdit: true,
+                                                      transactionData: data,
+                                                    ),
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
                             ],
                           ),
                         ),
@@ -286,8 +330,9 @@ class _HomePageState extends State<HomePage> {
                   decoration: BoxDecoration(color: primaryColor),
                   child: Center(
                     child: Text(
-                      state.message.toUpperCase(),
+                      'Failed to load data',
                       style: labelFormTextStyle,
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 );
@@ -301,8 +346,9 @@ class _HomePageState extends State<HomePage> {
             decoration: BoxDecoration(color: primaryColor),
             child: Center(
               child: Text(
-                state.message.toUpperCase(),
+                'Failed to load data',
                 style: labelFormTextStyle,
+                textAlign: TextAlign.center,
               ),
             ),
           );

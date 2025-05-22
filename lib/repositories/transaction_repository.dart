@@ -37,7 +37,7 @@ class TransactionRepository {
     }
   }
 
-  // update transaction
+  // update transactio
   Future<Either<String, TransactionModel>> updateTransaction(
     TransactionModel requestBody,
   ) async {

@@ -2,6 +2,7 @@ import 'package:finote/bloc/category_bloc.dart';
 import 'package:finote/bloc/login_bloc.dart';
 import 'package:finote/bloc/register_bloc.dart';
 import 'package:finote/bloc/transaction_bloc.dart';
+import 'package:finote/bloc/user_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:finote/pages/pages.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => RegisterBloc()),
         BlocProvider(create: (_) => CategoryBloc()),
         BlocProvider(create: (_) => TransactionBloc()),
+        BlocProvider(create: (_) => UserBloc()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

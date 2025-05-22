@@ -94,53 +94,66 @@ class _CategoryPageState extends State<CategoryPage> {
                     ],
                   ),
                   SpaceHeight(15),
-                  Expanded(
-                    child: ListView.separated(
-                      itemCount: categories.length,
-                      separatorBuilder: (context, index) => SpaceHeight(10),
-                      itemBuilder: (context, index) {
-                        final data = categories[index];
-                        return TransactionCardWidget(
-                          isTransaction: false,
-                          isIncome: isIncome,
-                          description: data.nama,
-                          onDelete: () async {
-                            final result = await showDialog(
-                              context: context,
-                              builder:
-                                  (context) => DeleteDialog(title: 'Category'),
+                  categories.isEmpty
+                      ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Text(
+                            'Category is empty',
+                            style: subTitleListTextStyle,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                      : Expanded(
+                        child: ListView.separated(
+                          itemCount: categories.length,
+                          separatorBuilder: (context, index) => SpaceHeight(10),
+                          itemBuilder: (context, index) {
+                            final data = categories[index];
+                            return TransactionCardWidget(
+                              isTransaction: false,
+                              isIncome: isIncome,
+                              description: data.nama,
+                              onDelete: () async {
+                                final result = await showDialog(
+                                  context: context,
+                                  builder:
+                                      (context) => DeleteDialog(id: data.id!),
+                                );
+                                result
+                                    ? setState(() {
+                                      categories.removeAt(index);
+                                    })
+                                    : null;
+                              },
+                              onEdit: () {
+                                showDialog(
+                                  context: context,
+                                  builder:
+                                      (context) => AddEditCategoryDialog(
+                                        isEdit: true,
+                                        categoryList: getData,
+                                        index: index,
+                                        isIncome:
+                                            data.jenis == 'income'
+                                                ? true
+                                                : false,
+                                        data: data,
+                                      ),
+                                );
+                              },
                             );
-                            result
-                                ? setState(() {
-                                  categories.removeAt(index);
-                                })
-                                : null;
                           },
-                          onEdit: () {
-                            showDialog(
-                              context: context,
-                              builder:
-                                  (context) => AddEditCategoryDialog(
-                                    isEdit: true,
-                                    categoryList: getData,
-                                    index: index,
-                                    isIncome:
-                                        data.jenis == 'income' ? true : false,
-                                    data: data,
-                                  ),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ),
+                        ),
+                      ),
                 ],
               ),
             ),
           );
         }
         if (state is CategoryFailed) {
-          return Center(child: Text(state.message));
+          return Center(child: Text('Failed to get categories'));
         }
         return Container();
       },

@@ -12,7 +12,7 @@ class RegisterRepository {
       final result = await apiService.register(requestBody);
       return Right(result);
     } catch (e) {
-      return Left('register failed');
+      return Left(e.toString());
     }
   }
 }

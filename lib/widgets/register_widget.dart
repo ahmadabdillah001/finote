@@ -71,12 +71,12 @@ class _RegisterWidgetState extends State<RegisterWidget> {
             } else if (state is RegisterFailed) {
               ScaffoldMessenger.of(
                 context,
-              ).showSnackBar(const SnackBar(content: Text('Register Failed')));
+              ).showSnackBar(SnackBar(content: Text('Register Failed')));
             }
           },
           builder: (context, state) {
             if (state is RegisterLoading) {
-              return const CircularProgressIndicator();
+              return CircularProgressIndicator(color: secondaryColor);
             }
             return CustomButtonWidget(
               title: 'Register',

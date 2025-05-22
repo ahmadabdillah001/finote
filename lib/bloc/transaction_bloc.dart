@@ -39,7 +39,9 @@ class TransactionBloc extends Bloc<TransactionEvent, TransactionState> {
 
     on<UpdateTransaction>((event, emit) async {
       emit(TransactionLoading());
-      final result = await repository.updateTransaction(event.requestBody);
+      final result = await repository.updateTransaction(
+        event.requestBody,
+      );
       result.fold(
         (l) => emit(TransactionFailed(message: l)),
         (r) => emit(TransactionUpdateSuccess(responseData: r)),

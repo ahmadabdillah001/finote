@@ -87,214 +87,268 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
         backgroundColor: secondaryColor,
         leading: null,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(15),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  widget.isEdit
-                      ? SizedBox()
-                      : Switch(
-                        value: isIncome,
-                        onChanged: (value) async {
-                          categoryController = null;
-                          setState(() {
-                            isIncome = value;
-                            updateCategories();
-                          });
-                        },
-                        activeColor: whiteColor,
-                        activeTrackColor: greenColor,
-                        inactiveThumbColor: whiteColor,
-                        inactiveTrackColor: redColor,
-                      ),
-                  SpaceWidth(10),
-                  widget.isEdit
-                      ? SizedBox()
-                      : isIncome
-                      ? Text('Income', style: lableListTextStyle)
-                      : Text('Expanse', style: lableListTextStyle),
-                ],
-              ),
-              SpaceHeight(15),
-              InputFormWidget(
-                controller: nameController,
-                label: 'Title',
-                hint: 'xxxx',
-              ),
-              SpaceHeight(15),
-              InputFormWidget(
-                isAmount: true,
-                controller: amountController,
-                label: 'Amount',
-                hint: 'total amount',
-              ),
-              SpaceHeight(15),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Category',
-                    style: labelFormTextStyle.copyWith(color: whiteColor),
+      body:
+          widget.categoryList.isEmpty
+              ? Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Text(
+                    'Category is empty,\nplease add category first',
+                    style: subTitleListTextStyle,
+                    textAlign: TextAlign.center,
                   ),
-                  SpaceHeight(8),
-                  DropdownButtonFormField<String>(
-                    dropdownColor: primaryColor,
-                    value: categoryController,
-                    decoration: InputDecoration(
-                      hintStyle: hintFormTextStyle,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: whiteColor, width: 2),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: whiteColor, width: 2),
-                      ),
-                      hintText: '- select category -',
-                    ),
-                    style: hintFormTextStyle,
-                    items:
-                        categories.map((item) {
-                          return DropdownMenuItem<String>(
-                            value: item.toString(),
-                            child: Text(
-                              item.toString(),
-                              style: labelFormTextStyle.copyWith(
-                                color:
-                                    item == '- select category -'
-                                        ? greyColor
-                                        : whiteColor,
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                    onChanged: (value) async {
-                      setState(() {
-                        categoryController = value;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              SpaceHeight(15),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Date',
-                    style: labelFormTextStyle.copyWith(color: whiteColor),
-                  ),
-                  SpaceHeight(8),
-                  TextField(
-                    readOnly: true,
-                    style: labelFormTextStyle.copyWith(color: whiteColor),
-                    cursorColor: whiteColor,
-                    controller: dateController,
-                    decoration: InputDecoration(
-                      hintStyle: hintFormTextStyle,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: whiteColor, width: 2),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: whiteColor, width: 2),
-                      ),
-                      hintText: 'yyyy-mm-dd',
-                    ),
-                    onTap: () async {
-                      DateTime? pickedDate = await showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(2000),
-                        lastDate: DateTime.now(),
-                        barrierColor: primaryColor,
-                      );
-
-                      if (pickedDate != null) {
-                        final dateFormated = DateFormat(
-                          'yyyy-MM-dd',
-                        ).format(pickedDate);
-                        dateController.text = dateFormated;
-                      }
-                    },
-                  ),
-                ],
-              ),
-              SpaceHeight(15),
-              InputFormWidget(
-                controller: descriptionController,
-                label: 'Description',
-                hint: 'description',
-              ),
-              SpaceHeight(30),
-              BlocConsumer<TransactionBloc, TransactionState>(
-                listener: (context, state) {
-                  if (state is TransactionCreateSuccess) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Transaction Added')),
-                    );
-                    Navigator.pop(context);
-                  } else if (state is TransactionUpdateSuccess) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Transaction Updated')),
-                    );
-                    Navigator.pop(context);
-                  } else if (state is TransactionFailed) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(
+                ),
+              )
+              : Padding(
+                padding: const EdgeInsets.all(15),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
                           widget.isEdit
-                              ? 'Failed Update Transaction'
-                              : 'Failed Add Transaction',
-                        ),
+                              ? SizedBox()
+                              : Switch(
+                                value: isIncome,
+                                onChanged: (value) async {
+                                  categoryController = null;
+                                  setState(() {
+                                    isIncome = value;
+                                    updateCategories();
+                                  });
+                                },
+                                activeColor: whiteColor,
+                                activeTrackColor: greenColor,
+                                inactiveThumbColor: whiteColor,
+                                inactiveTrackColor: redColor,
+                              ),
+                          SpaceWidth(10),
+                          widget.isEdit
+                              ? SizedBox()
+                              : isIncome
+                              ? Text('Income', style: lableListTextStyle)
+                              : Text('Expanse', style: lableListTextStyle),
+                        ],
                       ),
-                    );
-                  }
-                },
-                builder: (context, state) {
-                  if (state is TransactionLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  return CustomButtonWidget(
-                    title:
-                        widget.isEdit
-                            ? 'Save Change'
-                            : isIncome
-                            ? 'Add Income'
-                            : 'Add Expanse',
-                    width: double.infinity,
-                    onPressed: () {
-                      final data = TransactionModel(
-                        categoryId:
-                            widget.categoryList
-                                .firstWhere((e) => e.nama == categoryController)
-                                .id ??
-                            0,
-                        judul: nameController.text,
-                        jumlah: int.parse(amountController.text),
-                        tanggal: dateController.text,
-                        jenis: isIncome ? 'income' : 'expanse',
-                        keterangan: descriptionController.text,
-                      );
-                      widget.isEdit
-                          ? context.read<TransactionBloc>().add(
-                            UpdateTransaction(data),
-                          )
-                          : context.read<TransactionBloc>().add(
-                            CreateTransaction(data),
+                      SpaceHeight(15),
+                      InputFormWidget(
+                        controller: nameController,
+                        label: 'Title',
+                        hint: 'add title',
+                      ),
+                      SpaceHeight(15),
+                      InputFormWidget(
+                        isAmount: true,
+                        controller: amountController,
+                        label: 'Amount',
+                        hint: 'total amount',
+                      ),
+                      SpaceHeight(15),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Category',
+                            style: labelFormTextStyle.copyWith(
+                              color: whiteColor,
+                            ),
+                          ),
+                          SpaceHeight(8),
+                          DropdownButtonFormField<String>(
+                            dropdownColor: primaryColor,
+                            value: categoryController,
+                            decoration: InputDecoration(
+                              hintStyle: hintFormTextStyle,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: whiteColor,
+                                  width: 2,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: whiteColor,
+                                  width: 2,
+                                ),
+                              ),
+                              hintText: '- select category -',
+                            ),
+                            style: hintFormTextStyle,
+                            items:
+                                categories.map((item) {
+                                  return DropdownMenuItem<String>(
+                                    value: item.toString(),
+                                    child: Text(
+                                      item.toString(),
+                                      style: labelFormTextStyle.copyWith(
+                                        color:
+                                            item == '- select category -'
+                                                ? greyColor
+                                                : whiteColor,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                            onChanged: (value) async {
+                              setState(() {
+                                categoryController = value;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      SpaceHeight(15),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Date',
+                            style: labelFormTextStyle.copyWith(
+                              color: whiteColor,
+                            ),
+                          ),
+                          SpaceHeight(8),
+                          TextField(
+                            readOnly: true,
+                            style: labelFormTextStyle.copyWith(
+                              color: whiteColor,
+                            ),
+                            cursorColor: whiteColor,
+                            controller: dateController,
+                            decoration: InputDecoration(
+                              hintStyle: hintFormTextStyle,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: whiteColor,
+                                  width: 2,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide(
+                                  color: whiteColor,
+                                  width: 2,
+                                ),
+                              ),
+                              hintText: 'yyyy-mm-dd',
+                            ),
+                            onTap: () async {
+                              DateTime? pickedDate = await showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime.now(),
+                                barrierColor: primaryColor,
+                              );
+
+                              if (pickedDate != null) {
+                                final dateFormated = DateFormat(
+                                  'yyyy-MM-dd',
+                                ).format(pickedDate);
+                                dateController.text = dateFormated;
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                      SpaceHeight(15),
+                      InputFormWidget(
+                        controller: descriptionController,
+                        label: 'Description',
+                        hint: 'add description',
+                      ),
+                      SpaceHeight(30),
+                      BlocConsumer<TransactionBloc, TransactionState>(
+                        listener: (context, state) {
+                          if (state is TransactionCreateSuccess) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Transaction Added'),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          } else if (state is TransactionUpdateSuccess) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Transaction Updated'),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          } else if (state is TransactionFailed) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  widget.isEdit
+                                      ? 'Failed Update Transaction'
+                                      : ' Add Transaction',
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        builder: (context, state) {
+                          if (state is TransactionLoading) {
+                            return Center(
+                              child: CircularProgressIndicator(
+                                color: secondaryColor,
+                              ),
+                            );
+                          }
+                          return CustomButtonWidget(
+                            title:
+                                widget.isEdit
+                                    ? 'Save Change'
+                                    : isIncome
+                                    ? 'Add Income'
+                                    : 'Add Expanse',
+                            width: double.infinity,
+                            onPressed: () {
+                              if (nameController.text.isEmpty ||
+                                  amountController.text.isEmpty ||
+                                  categoryController == '- select category -' ||
+                                  dateController.text.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Please fill all field'),
+                                  ),
+                                );
+                                return;
+                              }
+
+                              final data = TransactionModel(
+                                id: widget.transactionData!.id,
+                                categoryId:
+                                    widget.categoryList
+                                        .firstWhere(
+                                          (e) => e.nama == categoryController,
+                                        )
+                                        .id!,
+                                judul: nameController.text,
+                                jumlah: int.parse(amountController.text),
+                                tanggal: dateController.text,
+                                jenis: isIncome ? 'income' : 'expanse',
+                                keterangan: descriptionController.text,
+                              );
+                              if (widget.isEdit) {
+                                context.read<TransactionBloc>().add(
+                                  UpdateTransaction(data),
+                                );
+                              } else {
+                                context.read<TransactionBloc>().add(
+                                  CreateTransaction(data),
+                                );
+                              }
+                            },
                           );
-                    },
-                  );
-                },
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
