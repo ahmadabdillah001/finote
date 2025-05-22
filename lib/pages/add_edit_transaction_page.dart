@@ -318,25 +318,38 @@ class _AddEditTransactionPageState extends State<AddEditTransactionPage> {
                                 return;
                               }
 
-                              final data = TransactionModel(
-                                id: widget.transactionData!.id,
-                                categoryId:
-                                    widget.categoryList
-                                        .firstWhere(
-                                          (e) => e.nama == categoryController,
-                                        )
-                                        .id!,
-                                judul: nameController.text,
-                                jumlah: int.parse(amountController.text),
-                                tanggal: dateController.text,
-                                jenis: isIncome ? 'income' : 'expanse',
-                                keterangan: descriptionController.text,
-                              );
                               if (widget.isEdit) {
+                                final data = TransactionModel(
+                                  id: widget.transactionData!.id,
+                                  categoryId:
+                                      widget.categoryList
+                                          .firstWhere(
+                                            (e) => e.nama == categoryController,
+                                          )
+                                          .id!,
+                                  judul: nameController.text,
+                                  jumlah: int.parse(amountController.text),
+                                  tanggal: dateController.text,
+                                  jenis: isIncome ? 'income' : 'expanse',
+                                  keterangan: descriptionController.text,
+                                );
                                 context.read<TransactionBloc>().add(
                                   UpdateTransaction(data),
                                 );
-                              } else {
+                              } else if (!widget.isEdit) {
+                                final data = TransactionModel(
+                                  categoryId:
+                                      widget.categoryList
+                                          .firstWhere(
+                                            (e) => e.nama == categoryController,
+                                          )
+                                          .id!,
+                                  judul: nameController.text,
+                                  jumlah: int.parse(amountController.text),
+                                  tanggal: dateController.text,
+                                  jenis: isIncome ? 'income' : 'expanse',
+                                  keterangan: descriptionController.text,
+                                );
                                 context.read<TransactionBloc>().add(
                                   CreateTransaction(data),
                                 );
