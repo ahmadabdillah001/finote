@@ -153,7 +153,16 @@ class _CategoryPageState extends State<CategoryPage> {
           );
         }
         if (state is CategoryFailed) {
-          return Center(child: Text('Failed to get categories'));
+          return Container(
+            decoration: BoxDecoration(color: primaryColor),
+            child: Center(
+              child: Text(
+                'Failed to load data',
+                style: labelFormTextStyle,
+                textAlign: TextAlign.center,
+              ),
+            ),
+          );
         }
         return Container();
       },
